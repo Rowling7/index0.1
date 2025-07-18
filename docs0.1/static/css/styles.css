@@ -1,0 +1,57 @@
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+  background-color: #f8f9fa;
+  /* 可选背景色 */
+}
+
+.search-container .form-control {
+  border-radius: 30px;
+  /* 圆角搜索框 */
+  padding-right: 60px;
+  /* 为按钮留出空间 */
+  width: 50%;
+  /* 控制搜索框宽度 */
+}
+
+.search-container .btn {
+  position: absolute;
+  right: 1.25rem;
+  border-radius: 30px;
+}
+
+.widget-icon,
+.widget-row1Col1 {
+  grid-column: span 1; /* 横跨 */
+  grid-row: span 1; /* 纵跨 */
+  background-color: #c0c0c0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.widget-row1Col2 {
+  grid-column: span 1; /* 横跨 */
+  grid-row: span 2; /* 纵跨 */
+  background-color: #c0c0c0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.widget-row2Col1 {
+  grid-column: span 1; /* 横跨 */
+  grid-row: span 1; /* 纵跨 */
+  background-color: #c0c0c0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.widget-row2Col2 {
+  grid-column: span 1; /* 横跨 */
+  grid-row: span 1; /* 纵跨 */
+  background-color: #c0c0c0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
