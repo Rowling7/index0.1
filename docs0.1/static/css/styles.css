@@ -37,6 +37,7 @@ body {
   height: 100vh;
   scroll-behavior: smooth;
   margin: 20px 60px 60px 60px;
+  transition: transform 0.3s ease;
 }
 
 .mainContainer::-webkit-scrollbar {

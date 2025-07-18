@@ -1,12 +1,12 @@
 fetch('static/data/data.json')
     .then(response => response.json())
     .then(data => {
-        const iconContainer = document.querySelector('.iconContainer');
+        const mainContainer = document.querySelector('.mainContainer');
 
         data.forEach(category => {
             const section = document.createElement('section');
             section.classList.add(`${category.id}-section`, 'snap-section');
-            section.style.scrollSnapAlign = 'end';
+            section.style.scrollSnapAlign = 'start';
             section.style.height = '100vh';
             section.style.width = '100%';
             section.style.display = 'flex';
@@ -15,11 +15,6 @@ fetch('static/data/data.json')
             section.style.justifyContent = 'start';
             section.style.backgroundColor = '#f9f9f9';
             section.style.boxSizing = 'border-box';
-
-            // 添加标题
-            const title = document.createElement('h2');
-            title.textContent = category.name;
-            section.appendChild(title);
 
             // 创建图标容器
             const gridContainer = document.createElement('div');
@@ -60,7 +55,7 @@ fetch('static/data/data.json')
             });
 
             section.appendChild(gridContainer);
-            iconContainer.appendChild(section);
+            mainContainer.appendChild(section); // 插入到 mainContainer 中
         });
     })
     .catch(error => console.error('加载数据失败:', error));
