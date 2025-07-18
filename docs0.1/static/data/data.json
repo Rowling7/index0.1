@@ -1,5 +1,6 @@
 [
     {
+        "index": 0,
         "id": "fun",
         "name": "娱乐",
         "children": [
@@ -226,6 +227,7 @@
         ]
     },
     {
+        "index": 1,
         "id": "network",
         "name": "网络",
         "children": [
@@ -397,6 +399,7 @@
         ]
     },
     {
+        "index": 2,
         "id": "tools",
         "name": "工具",
         "children": [
@@ -624,6 +627,7 @@
         ]
     },
     {
+        "index": 3,
         "id": "software",
         "name": "软件",
         "children": [
@@ -755,6 +759,7 @@
         ]
     },
     {
+        "index": 4,
         "id": "temp",
         "name": "临时",
         "children": [
@@ -821,6 +826,7 @@
         ]
     },
     {
+        "index": 5,
         "id": "trash",
         "name": "🗑️",
         "children": [

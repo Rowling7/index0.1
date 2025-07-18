@@ -34,9 +34,9 @@ body {
 .mainContainer {
   scroll-snap-type: y mandatory;
   /*overflow-y: scroll;*/
-  height: 100vh;
+  height: 78vh;
   scroll-behavior: smooth;
-  margin: 20px 60px 60px 60px;
+  margin: 20px 60px 10px 60px;
   transition: transform 0.6s ease;
   overflow-y: auto;
 }
