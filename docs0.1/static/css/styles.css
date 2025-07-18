@@ -1,19 +1,23 @@
+html,
+body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 .search-container {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1rem 0;
-  background-color: #f8f9fa;
-  /* 可选背景色 */
+  background-color: #f8f9fa; /* 可选背景色 */
 }
 
 .search-container .form-control {
-  border-radius: 30px;
-  /* 圆角搜索框 */
-  padding-right: 60px;
-  /* 为按钮留出空间 */
-  width: 50%;
-  /* 控制搜索框宽度 */
+  border-radius: 30px; /* 圆角搜索框 */
+  padding-right: 60px; /* 为按钮留出空间 */
+  width: 50%; /* 控制搜索框宽度 */
 }
 
 .search-container .btn {
@@ -21,7 +25,34 @@
   right: 1.25rem;
   border-radius: 30px;
 }
+.mainContainer {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+  scroll-behavior: smooth;
+}
 
+.snap-section {
+  scroll-snap-align: start;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.weidgetContainer,
+.iconContainer {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-auto-rows: 100px;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
 .widget-icon,
 .widget-row1Col1 {
   grid-column: span 1; /* 横跨 */
@@ -40,7 +71,7 @@
   box-sizing: border-box;
 }
 .widget-row2Col1 {
-  grid-column: span 1; /* 横跨 */
+  grid-column: span 2; /* 横跨 */
   grid-row: span 1; /* 纵跨 */
   background-color: #c0c0c0;
   width: 100%;
@@ -48,8 +79,8 @@
   box-sizing: border-box;
 }
 .widget-row2Col2 {
-  grid-column: span 1; /* 横跨 */
-  grid-row: span 1; /* 纵跨 */
+  grid-column: span 2; /* 横跨 */
+  grid-row: span 2; /* 纵跨 */
   background-color: #c0c0c0;
   width: 100%;
   max-width: 100%;
