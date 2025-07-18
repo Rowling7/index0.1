@@ -73,16 +73,6 @@ fetch("static/data/data.json")
       section.appendChild(gridContainer);
       mainContainer.appendChild(section); // 插入到 mainContainer 中
     });
-
-    // 初始化 tooltip
-    document
-      .querySelectorAll('[data-bs-toggle="tooltip"]')
-      .forEach((tooltipEl) => {
-        new bootstrap.Tooltip(tooltipEl);
-      });
-
-    // 初始化滚动逻辑
-    initScrollLoop(data.length - 1); // 传入最大 index（例如 5）
   })
   .catch((error) => console.error("加载数据失败:", error));
 
