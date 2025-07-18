@@ -34,6 +34,7 @@ fetch('static/data/data.json')
                 iconItem.style.backgroundPosition = 'center';
                 iconItem.style.width = '100px';
                 iconItem.style.height = '100px';
+                iconItem.style.borderRadius = '20px';
 
                 const link = document.createElement('a');
                 link.href = item.target;
@@ -43,11 +44,24 @@ fetch('static/data/data.json')
                 link.style.marginTop = '8px';
                 link.style.color = '#333';
                 link.style.textDecoration = 'none';
+                link.setAttribute('data-bs-toggle', 'tooltip');
+                link.setAttribute('title', item.name);
+                link.style.whiteSpace = 'nowrap';
+                link.style.overflow = 'hidden';
+                link.style.textOverflow = 'ellipsis';
 
-                const itemContainer = document.createElement('div');
+                const itemContainer = document.createElement('a'); // 改为 a 标签
+                itemContainer.href = item.target;
+                itemContainer.target = '_blank'; // 可选：新窗口打开
+                itemContainer.rel = 'noopener noreferrer'; // 安全性
                 itemContainer.style.display = 'flex';
                 itemContainer.style.flexDirection = 'column';
                 itemContainer.style.alignItems = 'center';
+                itemContainer.style.justifyContent = 'center';
+                itemContainer.style.textDecoration = 'none';
+                itemContainer.style.color = 'inherit';
+                itemContainer.style.cursor = 'pointer';
+
                 itemContainer.appendChild(iconItem);
                 itemContainer.appendChild(link);
 
@@ -59,3 +73,6 @@ fetch('static/data/data.json')
         });
     })
     .catch(error => console.error('加载数据失败:', error));
+document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltipEl => {
+    new bootstrap.Tooltip(tooltipEl);
+});

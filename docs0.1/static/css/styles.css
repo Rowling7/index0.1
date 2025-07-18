@@ -19,7 +19,7 @@ body {
 .search-container .form-control {
   border-radius: 30px;
   /* 圆角搜索框 */
-  padding-right: 60px;
+  padding-right: 10px;
   /* 为按钮留出空间 */
   width: 50%;
   /* 控制搜索框宽度 */
@@ -33,11 +33,12 @@ body {
 
 .mainContainer {
   scroll-snap-type: y mandatory;
-  overflow-y: scroll;
+  /*overflow-y: scroll;*/
   height: 100vh;
   scroll-behavior: smooth;
   margin: 20px 60px 60px 60px;
-  transition: transform 0.3s ease;
+  transition: transform 0.6s ease;
+  overflow-y: auto;
 }
 
 .mainContainer::-webkit-scrollbar {
@@ -47,18 +48,20 @@ body {
 
 .snap-section {
   scroll-snap-align: end;
+  scroll-snap-stop: always;
   height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f9f9f9;
   overflow-y: auto;
-  /* 允许内部滚动 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  transition: transform 0.6s ease;
 }
 
 .snap-section::-webkit-scrollbar {
   display: none;
-  /* 隐藏 Chrome/Safari 滚动条 */
 }
 
 .weidgetContainer,
@@ -81,7 +84,7 @@ body {
   /* 横跨 */
   grid-row: span 1;
   /* 纵跨 */
-  background-color: #c0c0c0;
+
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
