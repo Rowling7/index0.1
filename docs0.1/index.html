@@ -2,16 +2,18 @@
 <html lang="zh-CN" data-bs-theme="auto">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>导航示例</title>
-
-    <link rel="stylesheet" href="static/css/bootstrap-icons.min.css">
+    <!-- ClockWidget 样式 -->
+    <link rel="stylesheet" href="static/widgets/widget.css">
+    <link rel="stylesheet" href="static/css/bootstrap-icons.min.css" />
     <!-- Bootstrap 和项目资源 -->
-    <link rel="stylesheet" href="static/css/bootstrap.css">
+    <link rel="stylesheet" href="static/css/bootstrap.css" />
     <script src="static/js/bootstrap.bundle.js" defer></script>
-    <link rel="stylesheet" href="static/css/styles.css">
+    <link rel="stylesheet" href="static/css/styles.css" />
     <script src="static/js/main.js" defer></script>
+    <script src="static/widgets/widgets.js"></script>
 </head>
 
 <body>
@@ -43,7 +45,7 @@
 
     <div class="search-container">
         <form class="d-flex position-relative w-50" role="search">
-            <input class="form-control me-2" type="search" placeholder="搜索..." aria-label="搜索">
+            <input class="form-control me-2" type="search" placeholder="搜索..." aria-label="搜索" />
             <button class="btn btn-outline-primary position-absolute" type="submit">
                 <i class="bi bi-search"></i>
             </button>
@@ -52,33 +54,41 @@
 
     <div class="mainContainer">
         <section class="snap-section">
-            <div class="weidgetContainer">
-                <div class="nav-item widget-icon">图标2</div>
-                <div class="nav-item widget-icon">图标1</div>
-                <div class="nav-item widget-icon">图标2</div>
-                <div class="nav-item widget-icon">图标1</div>
-                <div class="nav-item widget-row1Col2">组件1</div>
-                <div class="nav-item widget-row1Col1">组件1</div>
-                <div class="nav-item widget-row2Col2">组件1</div>
-                <div class="nav-item widget-row1Col2">组件1</div>
-                <div class="nav-item widget-icon">图标2</div>
-                <div class="nav-item widget-icon">图标1</div>
-                <div class="nav-item widget-icon">图标2</div>
-                <div class="nav-item widget-row2Col2">组件1</div>
-                <div class="nav-item widget-row1Col2">组件1</div>
-                <div class="nav-item widget-row1Col1">组件1</div>
-                <div class="nav-item widget-row2Col2">组件1</div>
-                <div class="nav-item widget-row1Col2">组件1</div>
-                <div class="nav-item widget-row1Col1">组件1</div>
-                <div class="nav-item widget-row2Col2">组件1</div>
-                <div class="nav-item widget-row1Col2">组件1</div>
-                <div class="nav-item widget-row2Col1">组件1</div>
-                <div class="nav-item widget-icon">图标2</div>
-                <div class="nav-item widget-icon">图标1</div>
-            </div>
+            <div class="weidgetContainer"></div>
         </section>
         <!-- 动态插入的 XXX-icon-section 将放在这里 -->
     </div>
 </body>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 获取 widget 容器
+  const widgetContainer = document.querySelector('.weidgetContainer');
+  
+  if (!widgetContainer) {
+    console.error('无法找到 widget 容器');
+    return;
+  }
+
+  // 创建组件容器
+  widgetContainer.innerHTML = `
+    <div id="clockContainer"></div>
+    <div id="workTimeContainer"></div>
+  `;
+
+  // 初始化时钟组件
+  const clock = new ClockWidget({
+    containerId: "clockContainer",
+    highlightColor: "#ff5722"
+  });
+
+  // 初始化工作倒计时组件
+  const workTime = new WorkTimeWidget({
+    containerId: "workTimeContainer",
+    workHours: {
+      dailySalary: 300
+    }
+  });
+});
+</script>
 
 </html>

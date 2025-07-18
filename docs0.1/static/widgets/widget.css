@@ -1,0 +1,220 @@
+/* 基础字体定义 */
+@font-face {
+    font-family: 'CustomSans';
+    src: url('../fonts/NotoSansSC-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CustomSans';
+    src: url('../fonts/NotoSansSC-Bold.woff2') format('woff2');
+    font-weight: bold;
+    font-display: swap;
+}
+
+/* 基础组件样式 */
+.widget {
+    width: 240px;
+    height: 240px;
+    border-radius: 16px;
+    padding: 19px;
+    background: var(--widget-bg, rgba(255, 255, 255, 0.1));
+    color: var(--text-color, #333);
+    font-family: 'CustomSans', sans-serif;
+    box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* 时钟组件特定样式 */
+.clock-widget {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.time-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.hm-row {
+    display: flex;
+    align-items: baseline;
+    font-size: 66px;
+    line-height: 1;
+}
+
+.time-colon {
+    animation: blink 1s infinite;
+    color: var(--highlight-color, #9c27b0);
+    padding: 0 5px;
+}
+
+.seconds {
+    font-size: 36px;
+}
+
+.highlight-seven {
+    color: var(--highlight-seven-color, #9c27b0) !important;
+}
+
+.format-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: inherit;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+.format-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 工作倒计时组件特定样式 */
+.worktime-widget {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.countdown-item {
+    margin: 8px 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.countdown-label {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
+.countdown-value {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.salary-display {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.salary-label {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.salary-value {
+    font-size: 24px;
+    font-weight: bold;
+    background: var(--salary-gradient, red);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+    padding: 0 5px;
+}
+
+.settings-form {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.settings-row {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.settings-label {
+    width: 70px;
+    font-size: 12px;
+}
+
+.settings-input {
+    flex: 1;
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: inherit;
+}
+
+.flip-button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    cursor: pointer;
+    color: inherit;
+}
+
+.flip-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.save-button {
+    padding: 6px;
+    border-radius: 4px;
+    border: none;
+    background: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+/* 共享动画效果 */
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes breathing {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.1);
+    }
+
+    50% {
+        box-shadow: 0 0 20px 10px rgba(255, 0, 0, 0.2);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.3);
+    }
+}
+
+.breathing-effect {
+    animation: breathing 1.5s ease-in-out infinite;
+    border: 1px solid red !important;
+    box-shadow: 0 8px 10px rgba(255, 0, 0, 0.3) !important;
+}
