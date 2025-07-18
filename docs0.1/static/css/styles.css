@@ -4,6 +4,7 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  overflow: hidden;
 }
 
 .search-container {
@@ -30,6 +31,10 @@ body {
   overflow-y: scroll;
   height: 100vh;
   scroll-behavior: smooth;
+  margin: 10px;
+}
+.mainContainer::-webkit-scrollbar {
+  display: none; /* 隐藏 Chrome/Safari 滚动条 */
 }
 
 .snap-section {
