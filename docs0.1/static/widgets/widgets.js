@@ -364,7 +364,7 @@ class WeatherWidget extends BaseWidget {
 
   async loadCityData() {
     if (!this.options.cityDataPath) {
-      console.error("缺少cityDataPath配置");
+      console.info("缺少cityDataPath配置");
       return;
     }
 
@@ -773,7 +773,7 @@ class HotPointWidget extends BaseWidget {
         throw new Error('Unexpected API response format');
       }
     } catch (error) {
-      console.error('Fetch hot data failed:', error);
+      console.info('Fetch hot data failed:', error);
       this.showErrorState();
     }
   }
@@ -915,7 +915,7 @@ class YiyanWidget extends BaseWidget {
         throw new Error('数据格式错误');
       }
     } catch (error) {
-      console.error('获取一言失败:', error);
+      console.info('获取一言失败:', error);
       this.showErrorState();
     }
   }
@@ -947,16 +947,19 @@ function initWidgets() {
     console.error("无法找到 widget 容器");
     return;
   }
+  // 检查 localStorage 中是否有保存的组件顺序
+  const savedWidgetOrder = localStorage.getItem('widgetOrder');
+  let widgetOrder = savedWidgetOrder ? JSON.parse(savedWidgetOrder) : [
+    'clockContainer',
+    'workTimeContainer',
+    'weatherContainer',
+    'shortcutContainer',
+    'hotPointContainer',
+    'yiyanContainer'
+  ];
+  // 创建组件容器，按照保存的顺序排列
+  widgetContainer.innerHTML = widgetOrder.map(id => `<div id="${id}"></div>`).join('');
 
-  // 创建组件容器
-  widgetContainer.innerHTML = `
-    <div id="clockContainer"></div>
-    <div id="workTimeContainer"></div>
-    <div id="weatherContainer"></div>
-    <div id="shortcutContainer"></div>
-    <div id="hotPointContainer"></div>
-    <div id="yiyanContainer"></div>
-  `;
 
   // 初始化时钟组件
   const clock = new ClockWidget({
@@ -993,6 +996,23 @@ function initWidgets() {
   // 初始化一言组件
   new YiyanWidget({
     containerId: "yiyanContainer"
+  });
+
+  // 初始化拖拽排序
+  initSortable(widgetContainer, widgetOrder);
+}
+// 初始化拖拽排序功能
+function initSortable(container, initialOrder) {
+  new Sortable(container, {
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    onEnd: function (evt) {
+      // 获取新的顺序
+      const newOrder = Array.from(container.children).map(child => child.id);
+
+      // 保存到 localStorage
+      localStorage.setItem('widgetOrder', JSON.stringify(newOrder));
+    }
   });
 }
 // 暴露初始化函数给全局作用域
