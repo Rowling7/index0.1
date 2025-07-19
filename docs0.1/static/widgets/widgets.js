@@ -615,8 +615,8 @@ class WeatherWidget extends BaseWidget {
     document.querySelector(".weather-press").textContent =
       weatherData.main.pressure;
 
-    const feelsLike = (weatherData.main.feels_like - 273.15).toFixed(0);
-    document.querySelector(".feels-like").textContent = `${feelsLike}°`;
+    const feelsLike = weatherData.main.feels_like.toFixed(0);
+    document.querySelector(".feels-like").textContent = `${feelsLike}°C`;
 
     const windSpeed = weatherData.wind.speed;
     const windLevel = this.getWindLevel(windSpeed);
