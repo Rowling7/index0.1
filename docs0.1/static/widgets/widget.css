@@ -81,11 +81,60 @@
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 15px;
+    position: relative;
+    overflow: hidden;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .format-toggle:hover {
     background: rgba(255, 255, 255, 0.2);
 }
+
+/* 点击涟漪效果 */
+.format-toggle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+}
+
+.format-toggle:active::after {
+    animation: ripple 0.3s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0) translate(-50%, -50%);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(20, 20) translate(-50%, -50%);
+        opacity: 0;
+    }
+}
+
+.format-toggle.active {
+    background: var(--highlight-color, #9c27b0);
+    color: white;
+}
+
+.format-toggle.active::before {
+    content: "✓ ";
+}
+
+
+
+
 
 /* 工作倒计时组件特定样式 */
 
@@ -469,8 +518,10 @@
 /* 快捷方式组件样式 */
 .shortcut-widget {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2列 */
-    grid-template-rows: repeat(2, 1fr);    /* 2行 */
+    grid-template-columns: repeat(2, 1fr);
+    /* 2列 */
+    grid-template-rows: repeat(2, 1fr);
+    /* 2行 */
     gap: 15px;
     box-sizing: border-box;
 }

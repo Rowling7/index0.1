@@ -63,7 +63,7 @@ class ClockWidget extends BaseWidget {
         </div>
         <div class="seconds" id="seconds">00</div>
       </div>
-      <button class="format-toggle" id="toggleFormat">切换12/24小时制</button>
+      <button class="format-toggle" id="toggleFormat">切换12小时制</button>
     </div>
   `;
 
@@ -103,6 +103,9 @@ class ClockWidget extends BaseWidget {
     this.highlightNumber(document.getElementById("hours"));
     this.highlightNumber(document.getElementById("minutes"));
     this.highlightNumber(document.getElementById("seconds"));
+    // 更新按钮状态
+    const toggleBtn = document.getElementById("toggleFormat");
+    toggleBtn.classList.toggle("active", !this.options.use24HourFormat);
   }
 
   highlightNumber(element) {
