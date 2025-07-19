@@ -7,6 +7,7 @@
   --background-color: #f9f9f9;
   --navbar-bg: #f8f9fa;
   --item-bg: #f0f0f0;
+  --weekend-color: #f44336;
 }
 
 [data-bs-theme="dark"] {
@@ -18,6 +19,7 @@
   --background-color: #121212;
   --navbar-bg: #212529;
   --item-bg: #333333;
+  --weekend-color: #f44336;
 }
 
 html,

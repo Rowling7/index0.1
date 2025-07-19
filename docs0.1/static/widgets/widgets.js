@@ -638,7 +638,7 @@ class WeatherWidget extends BaseWidget {
   }
 }
 
-//快捷方式组件
+// 快捷方式组件
 class ShortcutWidget extends BaseWidget {
   getDefaultOptions() {
     return {
@@ -935,6 +935,237 @@ class YiyanWidget extends BaseWidget {
   }
 }
 
+// 日历组件
+class CalendarWidget extends BaseWidget {
+  getDefaultOptions() {
+    return {
+      ...super.getDefaultOptions(),
+      widgetClass: "widget calendar-widget widget-row2Col2",
+      holidaysDataPath: "static/data/2025.json"
+    };
+  }
+
+  async init() {
+    // 使用已存在的容器
+    const container = document.getElementById(this.options.containerId);
+    if (!container) {
+      console.error(`容器 ${this.options.containerId} 未找到`);
+      return;
+    }
+
+    // 初始化日期
+    this.date = new Date();
+    this.calendarGrid = 35; // 7 * 5 grid
+
+    // 加载节假日数据
+    await this.loadHolidayData();
+
+    // 渲染组件
+    this.render();
+  }
+
+  async loadHolidayData() {
+    try {
+      const response = await fetch(this.options.holidaysDataPath);
+      this.holidays = await response.json();
+    } catch (error) {
+      console.error('加载节假日数据失败:', error);
+      this.holidays = { dates: [] };
+    }
+  }
+
+  render() {
+    this.container.innerHTML = `
+      <div class="calendar-header">
+        <button class="calendar-nav prev"><i class="bi bi-chevron-left"></i></button>
+        <h4 class="calendar-title"></h4>
+        <button class="calendar-nav next"><i class="bi bi-chevron-right"></i></button>
+        <button class="calendar-today">今天</button>
+      </div>
+      <div class="calendar-weekdays">
+        <span class="weekend">日</span>
+        <span>一</span>
+        <span>二</span>
+        <span>三</span>
+        <span>四</span>
+        <span>五</span>
+        <span class="weekend">六</span>
+      </div>
+      <div class="calendar-days"></div>
+    `;
+
+    // 绑定事件
+    this.container.querySelector('.prev').addEventListener('click', () => this.changeMonth('last'));
+    this.container.querySelector('.next').addEventListener('click', () => this.changeMonth('next'));
+    this.container.querySelector('.calendar-today').addEventListener('click', () => {
+      this.date = new Date();
+      this.renderCalendar();
+    });
+
+    // 渲染日历
+    this.renderCalendar();
+  }
+
+  // 判断闰年
+  isLeap(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  }
+
+  // 获取月份天数
+  getDays(year, month) {
+    const feb = this.isLeap(year) ? 29 : 28;
+    const daysPerMonth = [31, feb, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    return daysPerMonth[month - 1];
+  }
+
+  // 获取相邻月份信息
+  getNextOrLastDays(date, type) {
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    if (type === 'last') {
+      const lastMonth = (month === 1 ? 12 : month - 1);
+      const lastYear = (month === 1 ? year - 1 : year);
+      return {
+        year: lastYear,
+        month: lastMonth,
+        days: this.getDays(lastYear, lastMonth)
+      };
+    }
+    if (type === 'next') {
+      const nextMonth = (month === 12 ? 1 : month + 1);
+      const nextYear = (month === 12 ? year + 1 : year);
+      return {
+        year: nextYear,
+        month: nextMonth,
+        days: this.getDays(nextYear, nextMonth)
+      };
+    }
+  }
+
+  // 生成日历数据
+  generateCalendar(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const days = this.getDays(year, month);
+    const weekIndex = new Date(`${year}/${month}/1`).getDay(); // 0-6
+
+    const { year: lastYear, month: lastMonth, days: lastDays } =
+      this.getNextOrLastDays(date, 'last');
+    const { year: nextYear, month: nextMonth } =
+      this.getNextOrLastDays(date, 'next');
+
+    const calendarTable = [];
+    for (let i = 0; i < this.calendarGrid; i++) {
+      if (i < weekIndex) {
+        calendarTable[i] = {
+          year: lastYear,
+          month: lastMonth,
+          day: lastDays - weekIndex + i + 1,
+          isCurrentMonth: false
+        };
+      } else if (i >= days + weekIndex) {
+        calendarTable[i] = {
+          year: nextYear,
+          month: nextMonth,
+          day: i + 1 - days - weekIndex,
+          isCurrentMonth: false
+        };
+      } else {
+        calendarTable[i] = {
+          year: year,
+          month: month,
+          day: i + 1 - weekIndex,
+          isCurrentMonth: true
+        };
+      }
+    }
+    return calendarTable;
+  }
+
+  getDateType(dateStr) {
+    const holiday = this.holidays.dates.find(d => d.date === dateStr);
+    return holiday ? holiday.type : null;
+  }
+
+  renderCalendar() {
+    const calendarData = this.generateCalendar(this.date);
+    const title = this.container.querySelector('.calendar-title');
+    const daysContainer = this.container.querySelector('.calendar-days');
+    const year = this.date.getFullYear();
+    const month = this.date.getMonth() + 1;
+    const day = this.date.getDate();
+
+    // 更新标题
+    title.textContent = `${year}年${month}月`;
+
+    // 清空并重新渲染日期
+    daysContainer.innerHTML = '';
+
+    calendarData.forEach(item => {
+      const dayElement = document.createElement('div');
+      const dateStr = `${item.year}-${item.month.toString().padStart(2, '0')}-${item.day.toString().padStart(2, '0')}`;
+      const dateObj = new Date(`${item.year}/${item.month}/${item.day}`);
+      const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+      const dateType = this.getDateType(dateStr);
+
+      dayElement.textContent = item.day;
+      dayElement.classList.add('calendar-day');
+
+      if (!item.isCurrentMonth) {
+        dayElement.classList.add('other-month');
+        if (dateType === 'public_holiday') {
+          dayElement.classList.add('other-month-holiday');
+        }
+      }
+
+      // 设置特殊日期样式
+      if (dateType === 'transfer_workday') {
+        dayElement.classList.add('transfer-workday');
+      } else if (dateType === 'public_holiday') {
+        dayElement.classList.add('public-holiday');
+      } else if (isWeekend) {
+        dayElement.classList.add('weekend');
+      }
+
+      // 设置当前选中日期和今天样式
+      if (item.day === day && item.month === month) {
+        dayElement.classList.add('selected');
+
+        const today = new Date();
+        if (today.getDate() === item.day &&
+          today.getMonth() + 1 === month &&
+          today.getFullYear() === year) {
+          dayElement.classList.add('today');
+        }
+      }
+
+      // 添加点击事件
+      dayElement.addEventListener('click', () => this.selectDate(dayElement, item));
+
+      daysContainer.appendChild(dayElement);
+    });
+  }
+
+  changeMonth(type) {
+    const newDays = this.getNextOrLastDays(this.date, type);
+    this.date.setFullYear(newDays.year);
+    this.date.setMonth(newDays.month - 1);
+    this.date.setDate(1);
+    this.renderCalendar();
+  }
+
+  selectDate(dayElement, item) {
+    this.date.setDate(item.day);
+
+    if (dayElement.classList.contains('other-month')) {
+      this.date.setMonth(item.month - 1);
+      this.date.setFullYear(item.year);
+    }
+
+    this.renderCalendar();
+  }
+}
+
 
 function initWidgets() {
   // 初始化时检查保存的主题
@@ -951,11 +1182,13 @@ function initWidgets() {
   const savedWidgetOrder = localStorage.getItem('widgetOrder');
   let widgetOrder = savedWidgetOrder ? JSON.parse(savedWidgetOrder) : [
     'clockContainer',
+    'calendarContainer',
     'workTimeContainer',
     'weatherContainer',
     'shortcutContainer',
     'hotPointContainer',
     'yiyanContainer'
+
   ];
   // 创建组件容器，按照保存的顺序排列
   widgetContainer.innerHTML = widgetOrder.map(id => `<div id="${id}"></div>`).join('');
@@ -996,6 +1229,11 @@ function initWidgets() {
   // 初始化一言组件
   new YiyanWidget({
     containerId: "yiyanContainer"
+  });
+
+  // 初始化日历组件
+  new CalendarWidget({
+    containerId: "calendarContainer"
   });
 
   // 初始化拖拽排序

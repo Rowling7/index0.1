@@ -1,373 +1,466 @@
-
-// 热搜组件
-class WeiboHotWidget {
+// CalendarWidget
+class CalendarWidget {
   constructor(options = {}) {
-    // 默认配置
-    this.defaultOptions = {
-      containerId: 'weiboHotContainer',  // 默认容器ID
-      updateInterval: 300000,             // 默认更新间隔(5分钟)
-      maxItems: 50,                       // 最大显示条目
-      defaultSource: 'weibo'              // 默认数据源 weibo/baidu
-    };
-
-    // 合并用户配置
-    this.options = { ...this.defaultOptions, ...options };
-
-    // 当前数据源
-    this.currentSource = this.options.defaultSource;
-
-    // API 地址
-    this.apiUrls = {
-      weibo: 'https://v2.xxapi.cn/api/weibohot',
-      baidu: 'https://v2.xxapi.cn/api/baiduhot'
-    };
-
-    // 注入样式
-    this.injectStyles();
-
-    // 初始化
+    this.containerId = options.containerId || 'calendarContainer';
+    this.date = new Date();
+    this.calendarGrid = 35; // 7 * 5 grid
     this.init();
   }
 
-  injectStyles() {
-    const styleId = 'weiboHotWidgetStyles';
-    if (document.getElementById(styleId)) return;
-
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = `
-      @font-face {
-        font-family: 'CustomSans';
-        src: url('static/fonts/NotoSansSC-Regular.woff2') format('woff2');
-        font-weight: normal;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'CustomSans';
-        src: url('static/fonts/NotoSansSC-Bold.woff2') format('woff2');
-        font-weight: bold;
-        font-display: swap;
-      }
-
-      #weiboHotWidget {
-        height: 240px;
-        border-radius: 12px;
-        padding: 16px;
-        background: var(--widget-bg);
-        color:  ${this.options.textColor};
-        font-family: 'CustomSans', sans-serif;
-        box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        flex-direction: column;
-        box-sizing: border-box;
-        overflow: hidden;
-      }
-
-      .widget-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-        color: inherit;
-      }
-
-      .widget-title {
-        font-size: 18px;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-      }
-
-      .switch-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: none;
-        border-radius: 4px;
-        padding: 4px 8px;
-        font-size: 12px;
-        cursor: pointer;
-        color: inherit;
-        transition: all 0.3s ease;
-        margin-left: 8px;
-      }
-
-      .switch-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-      }
-
-      .refresh-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: none;
-        border-radius: 4px;
-        padding: 4px 8px;
-        font-size: 12px;
-        cursor: pointer;
-        color: inherit;
-        transition: all 0.3s ease;
-      }
-
-      .refresh-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-      }
-
-      .hot-list {
-        flex: 1;
-        overflow-y: auto;
-        padding-right: 4px;
-      }
-
-      .hot-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between; /* 内容分布两侧 */
-        margin-bottom: 6px;           /* 缩小底部间距 */
-        padding: 4px 8px;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        height: 32px;                 /* 固定高度 */
-        overflow: hidden;
-      }
-
-      .hot-item:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-        transform: translateX(5px);
-      }
-
-      .hot-rank {
-        width: 24px;
-        height: 24px;
-        min-width: 24px;
-        min-height: 24px;
-        border-radius: 50%;
-        background-color: #e53935;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        margin-right: 8px;
-        font-size: 12px;
-        position: relative;
-      }
-
-      .hot-rank::after {
-        content: "";
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        border-radius: 50%;
-        box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.3);
-        pointer-events: none;
-      }
-
-      .baidu-hot .hot-rank {
-        background-color: #ff4040;
-      }
-
-      .weibo-hot .hot-rank {
-        background-color: #e53935;
-      }
-
-      .hot-info {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        color: inherit;
-      }
-
-      .hot-title {
-        font-size: 13px;
-        color: inherit;
-        margin-bottom: 4px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .hot-metric {
-        font-size: 11px;
-        color: #d32f2f;
-        background-color: rgba(255, 0, 0, 0.1);
-        border-radius: 4px;
-        padding: 1px 4px;
-        width: fit-content;
-        display: flex-end;
-      }
-
-      /* 滚动条样式 */
-      .hot-list::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .hot-list::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-      }
-
-      .hot-list::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
-      }
-
-      .hot-list::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.25);
-      }
-    `;
-    document.head.appendChild(style);
+  // 判断闰年
+  isLeap(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
   }
 
-  init() {
-    // 创建容器
-    let container = document.getElementById(this.options.containerId);
-    if (!container) {
-      container = document.createElement('div');
-      container.id = this.options.containerId;
-      document.body.appendChild(container);
+  // 获取月份天数
+  getDays(year, month) {
+    const feb = this.isLeap(year) ? 29 : 28;
+    const daysPerMonth = [31, feb, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    return daysPerMonth[month - 1];
+  }
+
+  // 获取相邻月份信息
+  getNextOrLastDays(date, type) {
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    if (type === 'last') {
+      const lastMonth = (month === 1 ? 12 : month - 1);
+      const lastYear = (month === 1 ? year - 1 : year);
+      return {
+        year: lastYear,
+        month: lastMonth,
+        days: this.getDays(lastYear, lastMonth)
+      };
     }
-
-    // 渲染组件
-    this.render();
-
-    // 首次加载数据
-    this.fetchHotData();
-
-    // 设置定时更新
-    this.startAutoUpdate();
+    if (type === 'next') {
+      const nextMonth = (month === 12 ? 1 : month + 1);
+      const nextYear = (month === 12 ? year + 1 : year);
+      return {
+        year: nextYear,
+        month: nextMonth,
+        days: this.getDays(nextYear, nextMonth)
+      };
+    }
   }
 
-  render() {
-    const container = document.getElementById(this.options.containerId);
-    container.innerHTML = `
-    <div id="weiboHotWidget" class="${this.currentSource}-hot">
-      <div class="widget-header">
-        <div class="widget-title">${this.currentSource === 'weibo' ? '微博热搜榜' : '百度热搜榜'}</div>
-        <button class="switch-btn" id="switchSourceBtn">${this.currentSource === 'weibo' ? '切换百度' : '切换微博'}</button>
-        <button class="refresh-btn" id="refreshBtn">刷新</button>
-      </div>
-      <div class="hot-list" id="hotList">
-        <!-- 热搜条目将在这里动态插入 -->
-        <div class="loading">加载中...</div>
-      </div>
-    </div>
-  `;
+  // 生成日历数据
+  generateCalendar(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const days = this.getDays(year, month);
+    const weekIndex = new Date(`${year}/${month}/1`).getDay(); // 0-6
 
-    // 绑定切换数据源事件
-    document.getElementById('switchSourceBtn').addEventListener('click', () => {
-      this.currentSource = this.currentSource === 'weibo' ? 'baidu' : 'weibo';
-      document.getElementById('weiboHotWidget').className = `${this.currentSource}-hot`;
-      document.querySelector('.widget-title').textContent = this.currentSource === 'weibo' ? '微博热搜榜' : '百度热搜榜';
-      document.getElementById('switchSourceBtn').textContent = this.currentSource === 'weibo' ? '切换百度' : '切换微博';
-      this.fetchHotData();
-    });
+    const { year: lastYear, month: lastMonth, days: lastDays } =
+      this.getNextOrLastDays(date, 'last');
+    const { year: nextYear, month: nextMonth } =
+      this.getNextOrLastDays(date, 'next');
 
-    // 绑定刷新事件
-    document.getElementById('refreshBtn').addEventListener('click', () => {
-      this.fetchHotData();
-    });
-  }
-
-  async fetchHotData() {
-    try {
-      const response = await fetch(this.apiUrls[this.currentSource]);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-
-      if (data.code === 200 && Array.isArray(data.data)) {
-        this.displayHotData(data.data.slice(0, this.options.maxItems));
+    const calendarTable = [];
+    for (let i = 0; i < this.calendarGrid; i++) {
+      if (i < weekIndex) {
+        calendarTable[i] = {
+          year: lastYear,
+          month: lastMonth,
+          day: lastDays - weekIndex + i + 1,
+          isCurrentMonth: false
+        };
+      } else if (i >= days + weekIndex) {
+        calendarTable[i] = {
+          year: nextYear,
+          month: nextMonth,
+          day: i + 1 - days - weekIndex,
+          isCurrentMonth: false
+        };
       } else {
-        throw new Error('Unexpected API response format');
+        calendarTable[i] = {
+          year: year,
+          month: month,
+          day: i + 1 - weekIndex,
+          isCurrentMonth: true
+        };
       }
-    } catch (error) {
+    }
+    return calendarTable;
+  }
 
-      this.showErrorState();
+  /**
+   * 渲染日历
+   */
+  renderCalendar(create = false) {
+    // 生成当前月份的日历数据
+    const calendarData = this.generateCalendar(this.date);
+    const title = document.getElementById('title');
+    const year = this.date.getFullYear();
+    const month = this.date.getMonth() + 1;
+    const day = this.date.getDate();
+
+    // 更新标题显示年月
+    if (title) title.innerText = `${year}-${month.toString().padStart(2, '0')}`;
+
+    const content = document.getElementById('content');
+    if (!content) return;
+
+    if (create) {
+      // 创建新的日历按钮元素
+      const fragment = document.createDocumentFragment();
+      calendarData.forEach(item => {
+        const button = document.createElement('button');
+        const dateStr = `${item.year}-${item.month.toString().padStart(2, '0')}-${item.day.toString().padStart(2, '0')}`;
+        const dateObj = new Date(`${item.year}/${item.month}/${item.day}`);
+        const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+        const dateType = this.getDateType(dateStr);
+
+        button.setAttribute('date', `${item.year}/${item.month}/${item.day}`);
+        button.innerText = item.day;
+
+        // 设置基本样式类
+        if (!item.isCurrentMonth) {
+          if (dateType === 'public_holiday') {
+            button.classList.add('other-month-holiday');
+          } else {
+            button.classList.add('grey');
+          }
+        }
+
+        // 按照优先级设置特殊日期样式
+        if (dateType === 'transfer_workday') {
+          button.classList.add('transfer-workday');
+        } else if (dateType === 'public_holiday') {
+          button.classList.add('public-holiday');
+        } else if (isWeekend) {
+          button.classList.add('weekend');
+        }
+
+        // 设置当前选中日期和今天样式
+        if (item.day === day && item.month === month) {
+          button.classList.add('selected');
+
+          // 如果是今天则额外添加today类
+          const today = new Date();
+          if (today.getDate() === item.day &&
+            today.getMonth() + 1 === month &&
+            today.getFullYear() === year) {
+            button.classList.add('today');
+          }
+        }
+
+        // 添加日期选择事件
+        button.addEventListener('click', () => {
+          this.selectDate(button);
+        });
+
+        fragment.appendChild(button);
+      });
+      content.appendChild(fragment);
+    } else {
+      // 更新现有日历按钮元素
+      calendarData.forEach((item, idx) => {
+        const button = content.children[idx];
+        if (!button) return;
+
+        const dateStr = `${item.year}-${item.month.toString().padStart(2, '0')}-${item.day.toString().padStart(2, '0')}`;
+        const dateObj = new Date(`${item.year}/${item.month}/${item.day}`);
+        const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+        const dateType = this.getDateType(dateStr);
+
+        // 重置样式并更新显示文本
+        button.className = '';
+        button.innerText = item.day;
+
+        // 设置基本样式类
+        if (!item.isCurrentMonth) {
+          if (dateType === 'public_holiday') {
+            button.classList.add('other-month-holiday');
+          } else {
+            button.classList.add('grey');
+          }
+        }
+
+        // 按照优先级设置特殊日期样式
+        if (dateType === 'transfer_workday') {
+          button.classList.add('transfer-workday');
+        } else if (dateType === 'public_holiday') {
+          button.classList.add('public-holiday');
+        } else if (isWeekend) {
+          button.classList.add('weekend');
+        }
+
+        // 设置当前选中日期和今天样式
+        if (item.day === day && item.month === month) {
+          button.classList.add('selected');
+
+          // 如果是今天则额外添加today类
+          const today = new Date();
+          if (today.getDate() === item.day &&
+            today.getMonth() + 1 === month &&
+            today.getFullYear() === year) {
+            button.classList.add('today');
+          }
+        }
+      });
     }
   }
 
-  displayHotData(data) {
-    const hotList = document.getElementById('hotList');
-    if (!hotList) return;
-
-    // 创建文档碎片以提高性能
-    const fragment = document.createDocumentFragment();
-
-    // 为每个热搜条目创建元素
-    data.forEach(item => {
-      const hotItem = document.createElement('div');
-      hotItem.className = 'hot-item';
-      hotItem.innerHTML = `
-        <div class="hot-rank">${item.index}</div>
-        <div class="hot-info">
-          <div class="hot-title">${item.title}</div>
-        </div>
-        <div class="hot-metric">${item.hot}</div>
-      `;
-
-
-      // 添加点击事件打开链接
-      hotItem.addEventListener('click', () => {
-        window.open(item.url, '_blank');
-      });
-
-      // 添加悬停效果
-      hotItem.addEventListener('mouseenter', () => {
-        hotItem.style.cursor = 'pointer';
-      });
-
-      fragment.appendChild(hotItem);
-    });
-
-    // 清空当前内容并添加新内容
-    hotList.innerHTML = '';
-    hotList.appendChild(fragment);
+  // 改变月份
+  changeMonth(type) {
+    const newDays = this.getNextOrLastDays(this.date, type);
+    this.date.setFullYear(newDays.year);
+    this.date.setMonth(newDays.month - 1);
+    this.date.setDate(1);
+    this.renderCalendar();
   }
 
-  showErrorState() {
-    const hotList = document.getElementById('hotList');
-    if (!hotList) return;
+  // 选中日期
+  selectDate(button) {
+    const year = this.date.getFullYear();
+    const month = this.date.getMonth() + 1;
+    const newDay = Number(button.innerText);
 
-    hotList.innerHTML = `
-      < div class= "error-state" >
-        <div class="error-icon">⚠️</div>
-        <div class="error-message">无法加载热搜数据</div>
-        <div class="error-details">请检查网络连接或稍后重试</div>
-        <button class="retry-btn">重试</button>
-      </div >
+    this.date.setDate(newDay);
+
+    if (button.classList.contains('grey')) {
+      let newMonth, newYear;
+      if (newDay < 15) { // next
+        newMonth = (month === 12 ? 1 : month + 1);
+        newYear = (month === 12 ? year + 1 : year);
+      } else { // last
+        newMonth = (month === 1 ? 12 : month - 1);
+        newYear = (month === 1 ? year - 1 : year);
+      }
+      this.date.setMonth(newMonth - 1);
+      this.date.setFullYear(newYear);
+    }
+    this.renderCalendar();
+
+    /*console.log("containerid：", this.containerId);
+    // 显示弹窗
+    const popup = new PopupWidget({
+      containerId: this.containerId,
+      title: `${year}年${month}月${newDay}日`,
+      content: `
+            <div id="calendar">
+                <div class="header">
+                <div class="btn-group">
+                    <button class="left"><</button>
+                    <button class="right">></button>
+                </div>
+                <h4 id="title"></h4>
+                <button class="skipToToday">今天</button>
+                </div>
+                <div class="week" style="    margin-top: 2px;">
+                <li class="weekend">日</li>
+                <li>一</li>
+                <li>二</li>
+                <li>三</li>
+                <li>四</li>
+                <li>五</li>
+                <li class="weekend">六</li>
+                </div>
+                <div id="content"></div>
+            </div>
+    `,
+      darkMode: true
+    });*/
+
+  }
+
+  async init() {
+    const container = document.getElementById(this.containerId);
+    if (!container) return;
+    // 加载节假日数据
+    await this.loadHolidayData();
+
+    // 注入HTML结构
+    container.innerHTML = `
+            <div id="calendarWidget">
+                <div class="header">
+                <div class="btn-group">
+                    <button class="left"><</button>
+                    <button class="right">></button>
+                </div>
+                <h4 id="title"></h4>
+                <button class="skipToToday">今天</button>
+                </div>
+                <div class="week" style="    margin-top: 2px;">
+                <li class="weekend">日</li>
+                <li>一</li>
+                <li>二</li>
+                <li>三</li>
+                <li>四</li>
+                <li>五</li>
+                <li class="weekend">六</li>
+                </div>
+                <div id="content"></div>
+            </div>
+    `;
+
+    // 注入CSS
+    const style = document.createElement('style');
+    style.textContent = `
+          @font-face {
+            font-family: 'CustomSans';
+            src: url('static/fonts/NotoSansSC-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-display: swap;
+          }
+
+          @font-face {
+            font-family: 'CustomSans';
+            src: url('static/fonts/NotoSansSC-Bold.woff2') format('woff2');
+            font-weight: bold;
+            font-display: swap;
+          }
+
+          #calendarWidget {
+            font-family: 'CustomSans', sans-serif;
+            box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: grid;
+            border-radius: 16px;
+            padding: 19px;
+            background: var(--widget-bg);
+            font-weight: normal;
+            color: var(--text-color);
+          }
+
+          /* 跨月节假日的浅红色样式 */
+          .other-month-holiday {
+            color: rgba(255, 0, 0, 0.5) !important;
+          }
+
+          /* 跨月普通日期的浅黑色样式 */
+          .grey {
+            color: rgba(0, 0, 0, 0.3) !important;
+          }
+
+          /* 周末样式 */
+          .weekend {
+            color: red !important;
+          }
+
+          /* 节假日样式 */
+          .public-holiday {
+            color: red !important;
+            /* 强制覆盖其他颜色 */
+            font-weight: bold !important
+          }
+
+          /* 调休工作日样式 */
+          .transfer-workday {
+            color: black !important;
+            font-weight: bold !important;
+          }
+
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .header h4 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 500;
+          }
+
+          .header button {
+            background: var(--option-color);
+            border: none;
+            padding: 6px 8px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+          }
+
+          .header button:hover {
+            background: var(--hover-bg);
+          }
+
+          .week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 0.9rem;
+          }
+
+          .week li::marker {
+            content: none;
+          }
+
+          #content {
+            margin-left: -4px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+          }
+
+          #content button {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'CustomSans', sans-serif;
+            font-size: 0.95rem;
+            padding: 1px 6px;
+            color: inherit;
+          }
+
+          #content button:hover {
+            background: var(--hover-bg);
+          }
+
+          #content button.today {
+            font-weight: bold;
+            color: var(--underline-color);
+          }
+
+          #content button.selected {
+            background: var(--underline-color);
+            color: var(--button-text) !important;
+          }
+
+          #content button.grey {
+            color: var(--border-color);
+            opacity: 0.7;
+          }
+          .left,.right,.skipToToday{
+            color: inherit;
+          }
+
         `;
+    document.head.appendChild(style);
 
-    // 添加重试按钮事件
-    hotList.querySelector('.retry-btn').addEventListener('click', () => {
-      this.fetchHotData();
+    // 初始化日历
+    this.renderCalendar(true);
+
+    // 绑定事件
+    document.querySelector('.left').addEventListener('click', () => this.changeMonth('last'));
+    document.querySelector('.right').addEventListener('click', () => this.changeMonth('next'));
+    document.querySelector('.skipToToday').addEventListener('click', () => {
+      this.date = new Date();
+      this.renderCalendar();
     });
+
   }
-
-  startAutoUpdate() {
-    // 如果已存在定时器，先清除
-    if (this.updateTimer) {
-      clearInterval(this.updateTimer);
-    }
-
-    // 开始新的定时更新
-    this.updateTimer = setInterval(() => {
-      this.fetchHotData();
-    }, this.options.updateInterval);
-  }
-
-  // 销毁方法，用于清理资源
-  destroy() {
-    if (this.updateTimer) {
-      clearInterval(this.updateTimer);
-      this.updateTimer = null;
-    }
-
-    const container = document.getElementById(this.options.containerId);
-    if (container && container.parentNode) {
-      container.parentNode.removeChild(container);
+  async loadHolidayData() {
+    try {
+      const response = await fetch('static/data/2025.json');
+      this.holidays = await response.json();
+    } catch (error) {
+      console.error('加载节假日数据失败:', error);
+      this.holidays = { dates: [] };
     }
   }
+
+  getDateType(dateStr) {
+    const holiday = this.holidays.dates.find(d => d.date === dateStr);
+    return holiday ? holiday.type : null;
+  }
+
 }
