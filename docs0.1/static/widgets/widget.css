@@ -46,6 +46,11 @@
     width: 100%;
 }
 
+.time-display.compact-display {
+    display: flex;
+    flex-direction: column;
+}
+
 .hm-row {
     display: flex;
     align-items: baseline;
@@ -85,18 +90,25 @@
 }
 
 /* 工作倒计时组件特定样式 */
+
+#workTimeContainer {
+    padding: 10px !important;
+}
+
 .worktime-widget {
     display: flex;
     flex-direction: column;
     position: relative;
 }
-
+/* 工作倒计时组件样式 */
 .countdown-item {
     margin: 8px 0;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex: 1;
+    text-align: center;
 }
 
 .countdown-label {
@@ -133,11 +145,48 @@
     padding: 0 5px;
 }
 
+.countdown-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.salary-row {
+    text-align: center;
+}
+
+.small-label {
+    font-size: 12px;
+    color: #666;
+}
+
+.small-value {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* 设置页面样式 */
 .settings-form {
     padding: 10px;
     display: flex;
     flex-direction: column;
     width: 100%;
+}
+
+.settings-form.compact-form {
+    padding: 8px;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
 }
 
 .settings-row {
@@ -149,6 +198,8 @@
 .settings-label {
     width: 70px;
     font-size: 12px;
+    margin-bottom: 2px;
+    color: #555;
 }
 
 .settings-input {
@@ -186,6 +237,19 @@
     cursor: pointer;
 }
 
+.settings-input.compact-input {
+    width: 100%;
+    padding: 4px 8px;
+    font-size: 12px;
+    height: 28px;
+}
+
+.save-button.compact-button {
+    margin-top: 8px;
+    padding: 4px 12px;
+    font-size: 12px;
+    width: 100%;
+}
 
 /* 天气组件样式 */
 .weather-widget {
