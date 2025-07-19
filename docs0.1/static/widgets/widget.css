@@ -773,6 +773,75 @@
     background: rgba(255, 255, 255, 0.2);
 }
 
+/* 一言组件样式 */
+.yiyan-widget {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#yiyanWidget {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#yiyanText {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    margin: 0px;
+}
+
+#yiyanText::-webkit-scrollbar {
+    display: none;
+}
+
+#yiyanText:hover {
+    opacity: 0.8;
+}
+
+.type-switcher {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 30px;
+    padding: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-color);
+    margin-top: 15px;
+}
+
+.type-switcher:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.type-switcher:active {
+    transform: scale(0.98);
+}
+
+
+
 
 
 /* 共享动画效果 */

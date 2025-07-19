@@ -842,7 +842,98 @@ class HotPointWidget extends BaseWidget {
   }
 }
 
+// 一言组件
+class YiyanWidget extends BaseWidget {
+  constructor(options = {}) {
+    super({
+      ...options,
+      widgetClass: "widget yiyan-widget widget-row4Col2"
+    });
 
+    // 默认配置
+    this.defaultOptions = {
+      apiUrlType: 'dujitang', // 默认类型
+      apiUrls: {
+        dujitang: 'https://v2.xxapi.cn/api/dujitang',
+        weibo: 'https://v2.xxapi.cn/api/yiyan?type=hitokoto'
+      }
+    };
+
+    // 合并用户配置
+    this.options = { ...this.defaultOptions, ...options };
+
+    // 初始化
+    this.init();
+  }
+
+  async init() {
+    // 渲染组件
+    this.render();
+
+    // 首次加载数据
+    await this.fetchYiyan();
+  }
+
+  render() {
+    this.container.innerHTML = `
+      <div id="yiyanWidget">
+        <p id="yiyanText">
+          <a href="#" class="yiyan-text">生气的本质就是在和自己的预期较劲</a>
+        </p>
+        <button class="type-switcher" id="typeSwitcher">切换内容源</button>
+      </div>
+    `;
+
+    // 绑定点击刷新事件
+    document.getElementById('yiyanText').addEventListener('click', (e) => {
+      e.preventDefault();
+      this.fetchYiyan();
+    });
+
+    // 切换类型按钮
+    document.getElementById('typeSwitcher').addEventListener('click', () => {
+      const types = Object.keys(this.options.apiUrls);
+      const currentIndex = types.indexOf(this.options.apiUrlType);
+      const nextIndex = (currentIndex + 1) % types.length;
+      this.options.apiUrlType = types[nextIndex];
+      this.fetchYiyan();
+    });
+  }
+
+  async fetchYiyan() {
+    try {
+      const apiUrl = this.options.apiUrls[this.options.apiUrlType];
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) throw new Error('网络错误');
+
+      const data = await response.json();
+
+      if (data.code === 200 && data.data) {
+        this.updateYiyan(data.data);
+      } else {
+        throw new Error('数据格式错误');
+      }
+    } catch (error) {
+      console.error('获取一言失败:', error);
+      this.showErrorState();
+    }
+  }
+
+  updateYiyan(text) {
+    const yiyanTextEl = document.querySelector('#yiyanText');
+    if (yiyanTextEl) {
+      yiyanTextEl.textContent = text;
+    }
+  }
+
+  showErrorState() {
+    const yiyanTextEl = document.querySelector('#yiyanText');
+    if (yiyanTextEl) {
+      yiyanTextEl.textContent = '小时候打喷嚏以为是有人在想我，原来是现在的自己';
+    }
+  }
+}
 
 
 function initWidgets() {
@@ -864,6 +955,7 @@ function initWidgets() {
     <div id="weatherContainer"></div>
     <div id="shortcutContainer"></div>
     <div id="hotPointContainer"></div>
+    <div id="yiyanContainer"></div>
   `;
 
   // 初始化时钟组件
@@ -896,6 +988,11 @@ function initWidgets() {
   // 初始化热点组件
   new HotPointWidget({
     containerId: "hotPointContainer"
+  });
+
+  // 初始化一言组件
+  new YiyanWidget({
+    containerId: "yiyanContainer"
   });
 }
 // 暴露初始化函数给全局作用域
