@@ -56,3 +56,25 @@ fetch("static/data/data.json")
     });
   })
   .catch((error) => console.error("加载数据失败:", error));
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  window.initWidgets();
+
+  // 暗黑模式切换
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  darkModeToggle.addEventListener('click', function () {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-bs-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-bs-theme', newTheme);
+
+    // 保存用户偏好
+    localStorage.setItem('theme', newTheme);
+  });
+
+  // 初始化时检查保存的主题
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-bs-theme', savedTheme);
+});

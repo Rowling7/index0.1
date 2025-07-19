@@ -688,6 +688,9 @@ class ShortcutWidget extends BaseWidget {
 }
 
 function initWidgets() {
+  // 初始化时检查保存的主题
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-bs-theme', savedTheme);
   // 获取 widget 容器
   const widgetContainer = document.querySelector(".weidgetContainer");
 
