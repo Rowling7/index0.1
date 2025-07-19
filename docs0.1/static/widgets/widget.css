@@ -15,10 +15,8 @@
 
 /* 基础组件样式 */
 .widget {
-    /*width: 240px;
-    height: 240px;*/
     border-radius: 16px;
-    padding: 19px;
+    padding: 11px;
     background: var(--widget-bg, rgba(255, 255, 255, 0.1));
     color: var(--text-color, #333);
     font-family: 'CustomSans', sans-serif;
@@ -100,7 +98,8 @@
     flex-direction: column;
     position: relative;
 }
-/* 工作倒计时组件样式 */
+
+/* 工作倒计时样式 */
 .countdown-item {
     margin: 8px 0;
     width: 100%;
@@ -467,6 +466,40 @@
 }
 
 
+/* 快捷方式组件样式 */
+.shortcut-widget {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2列 */
+    grid-template-rows: repeat(2, 1fr);    /* 2行 */
+    gap: 15px;
+    box-sizing: border-box;
+}
+
+.shortcut-grid {
+    display: contents;
+}
+
+.widget-icon.shortcut-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.widget-icon.shortcut-icon:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+.widget-icon.shortcut-icon img {
+    width: 80px;
+    height: 80px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    border-radius: 20px;
+}
 
 /* 共享动画效果 */
 @keyframes blink {

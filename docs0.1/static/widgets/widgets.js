@@ -480,9 +480,8 @@ class WeatherWidget extends BaseWidget {
       const isChinese = /[\u4e00-\u9fa5]/.test(inputValue);
       if (isChinese) {
         // 查找匹配的中文城市
-        const matchedCity = this.cityData.find(item =>
-          item.name === inputValue ||
-          item.label.includes(inputValue)
+        const matchedCity = this.cityData.find(
+          (item) => item.name === inputValue || item.label.includes(inputValue)
         );
         city = matchedCity?.pinyin || null;
       } else {
@@ -636,6 +635,55 @@ class WeatherWidget extends BaseWidget {
   }
 }
 
+class ShortcutWidget extends BaseWidget {
+  getDefaultOptions() {
+    return {
+      ...super.getDefaultOptions(),
+      widgetClass: "widget shortcut-widget widget-row2Col2",
+      shortcuts: [
+        {
+          url: "http://www.bilibili.com",
+          icon: "static/ico/bilibili.png",
+          alt: "bilibili",
+        },
+        {
+          url: "https://www.douyin.com/",
+          icon: "static/ico/douyin.png",
+          alt: "抖音",
+        },
+        {
+          url: "https://github.com/",
+          icon: "static/ico/github-black.png",
+          alt: "GitHub",
+        },
+        {
+          url: "#",
+          icon: "static/ico/loading0_compressed.gif",
+          alt: "加载中",
+        },
+      ],
+    };
+  }
+
+  init() {
+    const container = document.getElementById(this.options.containerId);
+    if (!container) {
+      console.error(`容器 ${this.options.containerId} 未找到`);
+      return;
+    }
+
+    container.innerHTML = `
+        <div class="shortcut-grid widget-row2col2">
+            ${this.options.shortcuts.map(item => `
+                <a href="${item.url}" class="widget-icon shortcut-icon" target="_blank" rel="noopener noreferrer">
+                    <img src="${item.icon}" alt="${item.alt}">
+                </a>
+            `).join('')}
+        </div>
+    `;
+  }
+}
+
 function initWidgets() {
   // 获取 widget 容器
   const widgetContainer = document.querySelector(".weidgetContainer");
@@ -650,6 +698,7 @@ function initWidgets() {
     <div id="clockContainer"></div>
     <div id="workTimeContainer"></div>
     <div id="weatherContainer"></div>
+    <div id="shortcutContainer"></div>
   `;
 
   // 初始化时钟组件
@@ -673,8 +722,11 @@ function initWidgets() {
   new WeatherWidget({
     containerId: "weatherContainer",
   });
+
+  //初始化快捷方式组件
+  new ShortcutWidget({
+    containerId: "shortcutContainer",
+  });
 }
-
-
 // 暴露初始化函数给全局作用域
 window.initWidgets = initWidgets;
