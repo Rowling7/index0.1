@@ -15,7 +15,7 @@
 
 /* 基础组件样式 */
 .widget {
-    border-radius: 16px;
+    border-radius: 22px;
     padding: 11px;
     background: var(--widget-bg, rgba(255, 255, 255, 0.1));
     color: var(--text-color, #333);
