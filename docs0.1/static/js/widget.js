@@ -2108,7 +2108,7 @@ class HitokotoWidget {
 
 }
 
-
+// 热搜组件
 class WeiboHotWidget {
   constructor(options = {}) {
     // 默认配置

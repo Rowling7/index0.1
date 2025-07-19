@@ -553,6 +553,228 @@
     border-radius: 20px;
 }
 
+
+/* 热搜组件样式 */
+.hotpoint-widget {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#hotPointWidget {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.widget-title {
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.switch-btn,
+.refresh-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.switch-btn {
+    margin-left: 8px;
+}
+
+.switch-btn:hover,
+.refresh-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.hot-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+    background-color: transparent;
+    -ms-overflow-style: none;
+}
+
+.hot-list::-webkit-scrollbar {
+    display: none;
+}
+
+.hot-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    height: 32px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: transparent;
+    /* 确保初始状态透明 */
+    position: relative;
+    /* 为子元素定位提供上下文 */
+}
+
+.hot-item:hover {
+    transform: translateX(5px);
+    background-color: rgba(255, 255, 255, 0.1);
+    /* 添加背景色 */
+}
+
+/* 如果需要更明显的效果 */
+.hot-item:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    z-index: -1;
+    /* 确保背景在内容下方 */
+    border-radius: 6px;
+}
+
+.hot-rank {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 8px;
+    font-size: 12px;
+    position: relative;
+}
+
+.hot-rank::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+.baidu-hot .hot-rank {
+    background-color: #ff4040;
+}
+
+.weibo-hot .hot-rank {
+    background-color: #e53935;
+}
+
+.hot-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.hot-title {
+    font-size: 13px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hot-metric {
+    font-size: 11px;
+    color: #d32f2f;
+    background-color: rgba(255, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 1px 4px;
+    width: fit-content;
+}
+
+/* 滚动条样式 */
+.hot-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.hot-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.hot-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+}
+
+.hot-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* 错误状态样式 */
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+
+.error-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.error-message {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.error-details {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 12px;
+}
+
+.retry-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+
 /* 共享动画效果 */
 @keyframes blink {
 

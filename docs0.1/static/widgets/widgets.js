@@ -638,6 +638,7 @@ class WeatherWidget extends BaseWidget {
   }
 }
 
+//快捷方式组件
 class ShortcutWidget extends BaseWidget {
   getDefaultOptions() {
     return {
@@ -687,6 +688,163 @@ class ShortcutWidget extends BaseWidget {
   }
 }
 
+// 热搜组件
+class HotPointWidget extends BaseWidget {
+  constructor(options = {}) {
+    super({
+      ...options,
+      widgetClass: "widget hotpoint-widget widget-row4Col2"
+    });
+
+    // 默认配置
+    this.defaultOptions = {
+      updateInterval: 300000,             // 默认更新间隔(5分钟)
+      maxItems: 50,                       // 最大显示条目
+      defaultSource: 'weibo'              // 默认数据源 weibo/baidu
+    };
+
+    // 合并用户配置
+    this.options = { ...this.defaultOptions, ...options };
+
+    // 当前数据源
+    this.currentSource = this.options.defaultSource;
+
+    // API 地址
+    this.apiUrls = {
+      weibo: 'https://v2.xxapi.cn/api/weibohot',
+      baidu: 'https://v2.xxapi.cn/api/baiduhot'
+    };
+
+    // 初始化
+    this.init();
+  }
+
+  async init() {
+    // 渲染组件
+    this.render();
+
+    // 首次加载数据
+    await this.fetchHotData();
+
+    // 设置定时更新
+    this.startAutoUpdate();
+  }
+
+  render() {
+    this.container.innerHTML = `
+      <div id="hotPointWidget" class="${this.currentSource}-hot">
+        <div class="widget-header">
+          <div class="widget-title">${this.currentSource === 'weibo' ? '微博热搜榜' : '百度热搜榜'}</div>
+          <button class="switch-btn" id="switchSourceBtn">${this.currentSource === 'weibo' ? '切换百度' : '切换微博'}</button>
+          <button class="refresh-btn" id="refreshBtn">刷新</button>
+        </div>
+        <div class="hot-list" id="hotList">
+          <div class="loading">加载中...</div>
+        </div>
+      </div>
+    `;
+
+    // 绑定切换数据源事件
+    document.getElementById('switchSourceBtn').addEventListener('click', () => {
+      this.currentSource = this.currentSource === 'weibo' ? 'baidu' : 'weibo';
+      document.getElementById('hotPointWidget').className = `${this.currentSource}-hot`;
+      document.querySelector('.widget-title').textContent = this.currentSource === 'weibo' ? '微博热搜榜' : '百度热搜榜';
+      document.getElementById('switchSourceBtn').textContent = this.currentSource === 'weibo' ? '切换百度' : '切换微博';
+      this.fetchHotData();
+    });
+
+    // 绑定刷新事件
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      this.fetchHotData();
+    });
+  }
+
+  async fetchHotData() {
+    try {
+      const response = await fetch(this.apiUrls[this.currentSource]);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      if (data.code === 200 && Array.isArray(data.data)) {
+        this.displayHotData(data.data.slice(0, this.options.maxItems));
+      } else {
+        throw new Error('Unexpected API response format');
+      }
+    } catch (error) {
+      console.error('Fetch hot data failed:', error);
+      this.showErrorState();
+    }
+  }
+
+  displayHotData(data) {
+    const hotList = document.getElementById('hotList');
+    if (!hotList) return;
+
+    // 创建文档碎片以提高性能
+    const fragment = document.createDocumentFragment();
+
+    // 为每个热搜条目创建元素
+    data.forEach(item => {
+      const hotItem = document.createElement('div');
+      hotItem.className = 'hot-item';
+      hotItem.innerHTML = `
+        <div class="hot-rank">${item.index}</div>
+        <div class="hot-info">
+          <div class="hot-title">${item.title}</div>
+        </div>
+        <div class="hot-metric">${item.hot}</div>
+      `;
+
+      // 添加点击事件打开链接
+      hotItem.addEventListener('click', () => {
+        window.open(item.url, '_blank');
+      });
+
+      fragment.appendChild(hotItem);
+    });
+
+    // 清空当前内容并添加新内容
+    hotList.innerHTML = '';
+    hotList.appendChild(fragment);
+  }
+
+  showErrorState() {
+    const hotList = document.getElementById('hotList');
+    if (!hotList) return;
+
+    hotList.innerHTML = `
+      <div class="error-state">
+        <div class="error-icon">⚠️</div>
+        <div class="error-message">无法加载热搜数据</div>
+        <div class="error-details">请检查网络连接或稍后重试</div>
+        <button class="retry-btn">重试</button>
+      </div>
+    `;
+
+    // 添加重试按钮事件
+    hotList.querySelector('.retry-btn').addEventListener('click', () => {
+      this.fetchHotData();
+    });
+  }
+
+  startAutoUpdate() {
+    // 如果已存在定时器，先清除
+    if (this.updateTimer) {
+      clearInterval(this.updateTimer);
+    }
+
+    // 开始新的定时更新
+    this.updateTimer = setInterval(() => {
+      this.fetchHotData();
+    }, this.options.updateInterval);
+  }
+}
+
+
+
+
 function initWidgets() {
   // 初始化时检查保存的主题
   const savedTheme = localStorage.getItem('theme') || 'light';
@@ -705,6 +863,7 @@ function initWidgets() {
     <div id="workTimeContainer"></div>
     <div id="weatherContainer"></div>
     <div id="shortcutContainer"></div>
+    <div id="hotPointContainer"></div>
   `;
 
   // 初始化时钟组件
@@ -732,6 +891,11 @@ function initWidgets() {
   //初始化快捷方式组件
   new ShortcutWidget({
     containerId: "shortcutContainer",
+  });
+
+  // 初始化热点组件
+  new HotPointWidget({
+    containerId: "hotPointContainer"
   });
 }
 // 暴露初始化函数给全局作用域
