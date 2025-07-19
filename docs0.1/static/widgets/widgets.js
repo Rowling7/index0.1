@@ -38,7 +38,7 @@ class ClockWidget extends BaseWidget {
   getDefaultOptions() {
     return {
       ...super.getDefaultOptions(),
-      widgetClass: "widget clock-widget",
+      widgetClass: "widget clock-widget widget-row2Col2",
       use24HourFormat: true,
       highlightColor: "#9c27b0",
     };
@@ -54,8 +54,8 @@ class ClockWidget extends BaseWidget {
 
     // 渲染组件
     container.innerHTML = `
-    <div id="clockWidget">
-      <div class="time-display">
+    <div id="clockWidget" class="widget-row2Col2">
+      <div class="time-display ">
         <div class="hm-row">
           <span id="hours">00</span>
           <span class="time-colon">:</span>
@@ -135,7 +135,7 @@ class WorkTimeWidget extends BaseWidget {
   getDefaultOptions() {
     return {
       ...super.getDefaultOptions(),
-      widgetClass: "widget worktime-widget",
+      widgetClass: "widget worktime-widget widget-row2Col2",
       workHours: {
         start: "07:50",
         lunch: "11:20",
@@ -152,7 +152,7 @@ class WorkTimeWidget extends BaseWidget {
       console.error(`容器 ${this.options.containerId} 未找到`);
       return;
     }
-
+    this.currentPage = "display"; // 强制设置为显示页面
     // 渲染组件
     this.render();
 
@@ -182,11 +182,10 @@ class WorkTimeWidget extends BaseWidget {
   render() {
     this.container.innerHTML = `
       <div class="widget-content">
-        ${
-          this.currentPage === "display"
-            ? this.renderDisplayPage()
-            : this.renderSettingsPage()
-        }
+        ${this.currentPage === "display"
+        ? this.renderDisplayPage()
+        : this.renderSettingsPage()
+      }
         <button class="flip-button" id="flipPage">
           ${this.currentPage === "display" ? "设置" : "返回"}
         </button>
@@ -205,48 +204,52 @@ class WorkTimeWidget extends BaseWidget {
       });
     }
   }
-
   renderDisplayPage() {
     return `
-      <div class="time-display">
+    <div class="time-display compact-display">
+      <div class="countdown-row">
         <div class="countdown-item">
-          <div class="countdown-label">吃！吃！吃！</div>
-          <div class="countdown-value" id="lunchCountdown">--:--:--</div>
-        </div>
-        <div class="countdown-item">
-          <div class="countdown-label">撤！撤！撤！</div>
-          <div class="countdown-value" id="endCountdown">--:--:--</div>
-        </div>
-        <div class="salary-display">
-          <div class="salary-label">窝囊费</div>
-          <div class="salary-value" id="salaryEarned">¥0</div>
+          <div class="countdown-label small-label">吃！吃！吃！</div>
+          <div class="countdown-value small-value" id="lunchCountdown">--:--:--</div>
         </div>
       </div>
-    `;
+        <div class="countdown-item">
+          <div class="countdown-label small-label">撤！撤！撤！</div>
+          <div class="countdown-value small-value" id="endCountdown">--:--:--</div>
+        </div>
+      </div>
+      <div class="salary-row">
+        <div class="salary-label small-label">窝囊废</div>
+        <div class="salary-value small-value" id="salaryEarned">¥0</div>
+      </div>
+    </div>
+  `;
   }
 
   renderSettingsPage() {
     return `
-      <div class="settings-form">
-        <div class="settings-row">
-          <div class="settings-label">上班时间</div>
-          <input type="time" class="settings-input" id="startTime" value="${this.options.workHours.start}">
+    <div class="settings-form compact-form">
+      <div class="settings-grid">
+        <div class="settings-group">
+          <label class="settings-label">上班时间</label>
+          <input type="time" class="settings-input compact-input" id="startTime" value="${this.options.workHours.start}">
         </div>
-        <div class="settings-row">
-          <div class="settings-label">午饭时间</div>
-          <input type="time" class="settings-input" id="lunchTime" value="${this.options.workHours.lunch}">
+        <div class="settings-group">
+          <label class="settings-label">午饭时间</label>
+          <input type="time" class="settings-input compact-input" id="lunchTime" value="${this.options.workHours.lunch}">
         </div>
-        <div class="settings-row">
-          <div class="settings-label">下班时间</div>
-          <input type="time" class="settings-input" id="endTime" value="${this.options.workHours.end}">
+        <div class="settings-group">
+          <label class="settings-label">下班时间</label>
+          <input type="time" class="settings-input compact-input" id="endTime" value="${this.options.workHours.end}">
         </div>
-        <div class="settings-row">
-          <div class="settings-label">日薪(元)</div>
-          <input type="number" class="settings-input" id="dailySalary" value="${this.options.workHours.dailySalary}">
+        <div class="settings-group">
+          <label class="settings-label">日薪(元)</label>
+          <input type="number" class="settings-input compact-input" id="dailySalary" value="${this.options.workHours.dailySalary}">
         </div>
-        <button class="save-button" id="saveSettings">保存设置</button>
       </div>
-    `;
+      <button class="save-button compact-button" id="saveSettings">保存</button>
+    </div>
+  `;
   }
 
   saveSettings() {
@@ -323,3 +326,355 @@ class WorkTimeWidget extends BaseWidget {
     safeUpdate("salaryEarned", `¥${salaryEarned.toFixed(3)}`);
   }
 }
+
+// 天气组件
+class WeatherWidget extends BaseWidget {
+  constructor(options = {}) {
+    super({
+      ...options,
+      widgetClass: "widget weather-widget widget-row2Col2",
+    });
+
+    // 合并默认配置
+    this.options = {
+      apiKey: "269d058c99d1f3cdcd9232f62910df1d", // OpenWeatherMap API Key
+      defaultCity: "Weihai", // 默认城市
+      cityDataPath: "static/data/city.json", // 城市数据路径
+      ...this.options,
+      ...options,
+    };
+
+    // 初始化
+    this.init();
+  }
+
+  async init() {
+    // 加载城市数据
+    await this.loadCityData();
+
+    // 渲染组件
+    this.render();
+
+    // 默认查询天气
+    this.getWeather();
+  }
+
+  async loadCityData() {
+    if (!this.options.cityDataPath) {
+      console.error("缺少cityDataPath配置");
+      return;
+    }
+
+    try {
+      const response = await fetch(this.options.cityDataPath);
+      if (!response.ok) throw new Error("网络响应不正常");
+
+      const data = await response.json();
+      if (!data.city) throw new Error("城市数据格式错误");
+
+      this.cityData = data.city.flatMap((group) => group.list);
+    } catch (error) {
+      console.error("加载城市数据失败:", error);
+    }
+  }
+
+  render() {
+    this.container.innerHTML = `
+      <div class="weather-content">
+        <!-- 温度区域 -->
+        <div class="weather-head">
+          <div class="weather-temp"></div>
+
+          <img class="weather-img" />
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="weather-input">
+          <select class="city-select">
+            <option value="Weihai">威海</option>
+            <option value="Wuhan">武汉</option>
+            <option value="Guiyang">贵阳</option>
+          </select>
+          <input type="text" class="city-input" list="citySuggestions" placeholder="城市">
+          <datalist id="citySuggestions"></datalist>
+          <button class="weather-btn">查询</button>
+        </div>
+
+        <!-- 主要天气信息 -->
+        <div class="weather-main">
+          <div class="weather-info-row">
+            <div class="weather-site"></div>
+            <div class="weather-result"></div>
+          </div>
+        </div>
+
+        <!-- 详细天气信息 -->
+        <div class="weather-detail">
+          <div class="weather-card">
+            <div class="card-face front">
+              <div class="detail-row">
+                <div class="detail-label">体感温度</div>
+                <div class="detail-value feels-like"></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label">风速</div>
+                <div class="detail-value wind-speed"></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label">风向</div>
+                <div class="detail-value wind-deg"></div>
+              </div>
+            </div>
+            <div class="card-face back">
+              <div class="detail-row">
+                <div class="detail-label">湿度</div>
+                <div class="detail-value weather-humi"></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label">大气压</div>
+                <div class="detail-value weather-press"></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label">云量</div>
+                <div class="detail-value clouds"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // 填充城市建议
+    if (this.cityData) {
+      const datalist = document.getElementById("citySuggestions");
+      this.cityData.forEach((city) => {
+        const option = document.createElement("option");
+        option.value = city.name;
+        datalist.appendChild(option);
+      });
+    }
+
+    // 设置默认城市
+    document.querySelector(".city-select").value = this.options.defaultCity;
+
+    // 绑定事件
+    document
+      .querySelector(".weather-btn")
+      .addEventListener("click", () => this.getWeather());
+    document
+      .querySelector(".city-select")
+      .addEventListener("change", () => this.getWeather());
+    document
+      .querySelector(".city-input")
+      .addEventListener("change", () => this.getWeather());
+  }
+
+  getWeather() {
+    let city;
+    const inputValue = document.querySelector(".city-input").value.trim();
+    const selectValue = document.querySelector(".city-select").value;
+
+    // 优先使用输入框的值
+    if (inputValue !== "") {
+      // 检查是否是中文
+      const isChinese = /[\u4e00-\u9fa5]/.test(inputValue);
+      if (isChinese) {
+        // 查找匹配的中文城市
+        const matchedCity = this.cityData.find(item =>
+          item.name === inputValue ||
+          item.label.includes(inputValue)
+        );
+        city = matchedCity?.pinyin || null;
+      } else {
+        // 直接使用输入的拼音/英文
+        city = inputValue;
+      }
+    } else {
+      // 使用下拉框选择的值
+      city = selectValue;
+    }
+
+    if (!city) {
+      console.error("无效的城市名称");
+      // 显示错误提示
+      this.showError("请输入有效的城市名称");
+      return;
+    }
+
+    // 显示加载状态
+    this.showLoading();
+
+    // 添加units=metric参数获取摄氏温度
+    fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${this.options.apiKey}&units=metric`
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP错误: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((weatherData) => {
+        if (!weatherData || weatherData.cod !== 200) {
+          throw new Error(weatherData?.message || "无效的天气数据");
+        }
+        this.updateWeatherUI(weatherData);
+      })
+      .catch((error) => {
+        console.error("获取天气数据失败:", error);
+        this.showError(error.message);
+      });
+  }
+
+  // 新增方法：显示加载状态
+  showLoading() {
+    const resultElement = document.querySelector(".weather-result");
+    if (resultElement) {
+      resultElement.textContent = "加载中...";
+      resultElement.style.color = "inherit";
+    }
+  }
+
+  // 新增方法：显示错误信息
+  showError(message) {
+    const resultElement = document.querySelector(".weather-result");
+    if (resultElement) {
+      resultElement.textContent = `错误: ${message}`;
+      resultElement.style.color = "red";
+    }
+  }
+  getWindLevel(speed) {
+    if (speed < 0.3) return "0级";
+    if (speed < 1.6) return "1级";
+    if (speed < 3.4) return "2级";
+    if (speed < 5.5) return "3级";
+    if (speed < 8.0) return "4级";
+    if (speed < 10.8) return "5级";
+    if (speed < 13.9) return "6级";
+    if (speed < 17.2) return "7级";
+    if (speed < 20.8) return "8级";
+    if (speed < 24.5) return "9级";
+    if (speed < 28.5) return "10级";
+    if (speed < 32.7) return "11级";
+    return "12级";
+  }
+
+  updateWeatherUI(weatherData) {
+    const weatherDescriptions = {
+      "clear sky": "晴空",
+      "few clouds": "少云",
+      "scattered clouds": "散云",
+      "broken clouds": "多云",
+      "overcast clouds": "阴天",
+      "shower rain": "阵雨",
+      rain: "雨",
+      "light rain": "小雨",
+      "moderate rain": "中雨",
+      "heavy rain": "大雨",
+      thunderstorm: "雷暴",
+      snow: "雪",
+      "light snow": "小雪",
+      "heavy snow": "大雪",
+      mist: "薄雾",
+      fog: "雾",
+      haze: "霾",
+      dust: "尘",
+      sand: "沙尘",
+      smoke: "烟雾",
+      tornado: "龙卷风",
+    };
+
+    const englishDescription = weatherData.weather[0].description.toLowerCase();
+    const chineseDescription =
+      weatherDescriptions[englishDescription] || englishDescription;
+
+    // 天气图标URL
+    const iconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${weatherData.weather[0].icon}.png`;
+
+    // 更新UI元素
+    document.querySelector(".weather-img").src = iconUrl;
+    document.querySelector(".weather-result").textContent = chineseDescription;
+    document.querySelector(".weather-humi").textContent =
+      weatherData.main.humidity;
+
+    const temp = weatherData.main.temp.toFixed(1);
+    document.querySelector(".weather-temp").textContent = temp;
+
+    /*const tempMax = (weatherData.main.temp_max - 273.15).toFixed(0);
+    document.querySelector(".weather-temp-max").textContent = `${tempMax}°`;
+
+    const tempMin = (weatherData.main.temp_min - 273.15).toFixed(0);
+    document.querySelector(".weather-temp-min").textContent = `${tempMin}°`;
+    */
+    document.querySelector(
+      ".weather-site"
+    ).textContent = `${weatherData.name} / ${weatherData.sys.country}`;
+
+    document.querySelector(".weather-press").textContent =
+      weatherData.main.pressure;
+
+    const feelsLike = (weatherData.main.feels_like - 273.15).toFixed(0);
+    document.querySelector(".feels-like").textContent = `${feelsLike}°`;
+
+    const windSpeed = weatherData.wind.speed;
+    const windLevel = this.getWindLevel(windSpeed);
+    document.querySelector(
+      ".wind-speed"
+    ).textContent = `${windLevel} | ${windSpeed} m/s`;
+
+    document.querySelector(
+      ".clouds"
+    ).textContent = `${weatherData.clouds.all}%`;
+
+    const windDeg = weatherData.wind.deg;
+    const directions = ["北", "东北", "东", "东南", "南", "西南", "西", "西北"];
+    const index = Math.round((windDeg % 360) / 45) % 8;
+    document.querySelector(".wind-deg").textContent = directions[index];
+
+    // 设置背景
+    this.container.style.backgroundImage = `url(${iconUrl})`;
+  }
+}
+
+function initWidgets() {
+  // 获取 widget 容器
+  const widgetContainer = document.querySelector(".weidgetContainer");
+
+  if (!widgetContainer) {
+    console.error("无法找到 widget 容器");
+    return;
+  }
+
+  // 创建组件容器
+  widgetContainer.innerHTML = `
+    <div id="clockContainer"></div>
+    <div id="workTimeContainer"></div>
+    <div id="weatherContainer"></div>
+  `;
+
+  // 初始化时钟组件
+  const clock = new ClockWidget({
+    containerId: "clockContainer",
+    highlightColor: "#ff5722",
+  });
+
+  // 初始化工作倒计时组件
+  const workTime = new WorkTimeWidget({
+    containerId: "workTimeContainer",
+    workHours: {
+      start: "07:50",
+      lunch: "11:20",
+      end: "17:30",
+      dailySalary: 250,
+    },
+  });
+
+  // 初始化天气组件
+  new WeatherWidget({
+    containerId: "weatherContainer",
+  });
+}
+
+
+// 暴露初始化函数给全局作用域
+window.initWidgets = initWidgets;

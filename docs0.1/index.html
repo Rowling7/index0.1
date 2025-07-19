@@ -5,12 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>导航示例</title>
-    <!-- ClockWidget 样式 -->
+    <!-- Widget 样式 -->
     <link rel="stylesheet" href="static/widgets/widget.css">
-    <link rel="stylesheet" href="static/css/bootstrap-icons.min.css" />
     <!-- Bootstrap 和项目资源 -->
+    <link rel="stylesheet" href="static/css/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="static/css/bootstrap.css" />
     <script src="static/js/bootstrap.bundle.js" defer></script>
+    <!-- 项目样式 -->
     <link rel="stylesheet" href="static/css/styles.css" />
     <script src="static/js/main.js" defer></script>
     <script src="static/widgets/widgets.js"></script>
@@ -60,35 +61,7 @@
     </div>
 </body>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // 获取 widget 容器
-  const widgetContainer = document.querySelector('.weidgetContainer');
-  
-  if (!widgetContainer) {
-    console.error('无法找到 widget 容器');
-    return;
-  }
-
-  // 创建组件容器
-  widgetContainer.innerHTML = `
-    <div id="clockContainer"></div>
-    <div id="workTimeContainer"></div>
-  `;
-
-  // 初始化时钟组件
-  const clock = new ClockWidget({
-    containerId: "clockContainer",
-    highlightColor: "#ff5722"
-  });
-
-  // 初始化工作倒计时组件
-  const workTime = new WorkTimeWidget({
-    containerId: "workTimeContainer",
-    workHours: {
-      dailySalary: 300
-    }
-  });
-});
+    document.addEventListener('DOMContentLoaded', window.initWidgets);
 </script>
 
 </html>

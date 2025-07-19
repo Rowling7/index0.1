@@ -15,8 +15,8 @@
 
 /* 基础组件样式 */
 .widget {
-    width: 240px;
-    height: 240px;
+    /*width: 240px;
+    height: 240px;*/
     border-radius: 16px;
     padding: 19px;
     background: var(--widget-bg, rgba(255, 255, 255, 0.1));
@@ -185,6 +185,224 @@
     color: white;
     cursor: pointer;
 }
+
+
+/* 天气组件样式 */
+.weather-widget {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.weather-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.weather-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 30%;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.weather-temp {
+    font-size: 36px;
+    font-weight: 300;
+    position: relative;
+}
+
+.weather-temp::after {
+    content: "°C";
+    font-size: 18px;
+    position: absolute;
+    top: 3px;
+    right: -20px;
+    opacity: 0.7;
+}
+
+.temperature-extremes {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.weather-temp-max,
+.weather-temp-min {
+    opacity: 0.7;
+    position: relative;
+    padding-left: 14px;
+    margin: 1px 0;
+}
+
+.weather-temp-max::before {
+    content: "↑";
+    position: absolute;
+    left: 0;
+}
+
+.weather-temp-min::before {
+    content: "↓";
+    position: absolute;
+    left: 0;
+}
+
+.weather-img {
+    width: 80px;
+    height: 80px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.weather-input {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    height: 15%;
+}
+
+.weather-input input,
+.weather-input select,
+.weather-input button {
+    border: none;
+    border-radius: 6px;
+    padding: 5px 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: inherit;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    border: 1px solid rgba(3, 3, 3, 0.1);
+}
+
+.weather-input input {
+    flex: 1;
+    min-width: 0;
+}
+
+.weather-input select {
+    width: 70px;
+}
+
+.weather-input button {
+    background-color: #3498db;
+    font-weight: 500;
+    cursor: pointer;
+    width: 60px;
+}
+
+.city-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 12px;
+    cursor: pointer;
+}
+
+.weather-main {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 8px;
+    height: 15%;
+}
+
+.weather-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.weather-site,
+.weather-result {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50%;
+}
+
+.weather-detail {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: auto;
+    height: 30%;
+    perspective: 1000px;
+    position: relative;
+}
+
+.weather-detail::after {
+    content: "悬停查看更多";
+    position: absolute;
+    bottom: 1px;
+    right: 8px;
+    font-size: 8px;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.weather-detail:hover::after {
+    opacity: 0;
+}
+
+.weather-card {
+    position: absolute;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.back {
+    transform: rotateY(180deg);
+}
+
+.weather-detail:hover .weather-card {
+    transform: rotateY(180deg);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 11px;
+    align-items: center;
+}
+
+.detail-label {
+    opacity: 0.7;
+}
+
+.detail-value {
+    font-weight: 500;
+}
+
+
 
 /* 共享动画效果 */
 @keyframes blink {
