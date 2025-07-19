@@ -72,7 +72,7 @@ body {
   grid-auto-rows: 100px;
   gap: 22px;
   padding: 0;
-  margin: 0;
+  margin: 8px;
   max-width: 100vw;
   box-sizing: border-box;
 }
